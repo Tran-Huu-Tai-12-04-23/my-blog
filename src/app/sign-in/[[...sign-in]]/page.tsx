@@ -1,5 +1,10 @@
+import Center from '@/app/component/layout/center';
 import { SignIn } from '@clerk/nextjs';
 
 export default function Page() {
-    return <SignIn />;
+    return (
+        <Center>
+            <SignIn />
+        </Center>
+    );
 }
