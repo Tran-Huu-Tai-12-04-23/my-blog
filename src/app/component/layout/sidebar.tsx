@@ -1,11 +1,17 @@
 import PathName from '@/app/constant/PathName';
 import { BellFilled, BookFilled, EditFilled, HomeFilled } from '@ant-design/icons';
-import { UserButton } from '@clerk/nextjs';
-import { Layout, Menu, Flex, type MenuProps } from 'antd';
+import { UserButton, useClerk } from '@clerk/nextjs';
+import { Layout, Menu, Flex, type MenuProps, Button, SiderProps, Popover } from 'antd';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React from 'react';
+import { TrashFilled } from '@/assets/icon';
+import useIsAdmin from '@/hook/useIsAdmin';
+
 const { Sider } = Layout;
+
 type MenuItem = Required<MenuProps>['items'][number];
 function getItem(
     label: React.ReactNode,
@@ -22,13 +28,31 @@ function getItem(
         path,
     } as MenuItem;
 }
-const items: MenuItem[] = [
-    getItem('Home', '/', '1', <HomeFilled />),
-    getItem('Notification', '', '2', <BellFilled />),
-    getItem('BookMark', '', '9', <BookFilled />),
-    getItem('Add post', PathName.ADD_POST, '10', <EditFilled />),
-];
-function SideBar() {
+
+type SideProps = {
+    activeSidebar: string;
+};
+function SideBar(props: SideProps) {
+    const { user } = useClerk();
+    const router = useRouter();
+
+    const isAdmin = useIsAdmin() || undefined;
+
+    const items: MenuItem[] = [
+        getItem('Home', '/', '1', <HomeFilled />),
+        getItem('Notification', PathName.NOTIFICATION, PathName.NOTIFICATION, <BellFilled />),
+        getItem('BookMark', PathName.BOOK_MARK, PathName.BOOK_MARK, <BookFilled />),
+        getItem('Add post', PathName.ADD_POST, PathName.ADD_POST, <EditFilled />),
+    ].filter(Boolean);
+
+    const itemsHasAdmin: MenuItem[] = [
+        getItem('Home', '/', '1', <HomeFilled />),
+        getItem('Notification', PathName.NOTIFICATION, PathName.NOTIFICATION, <BellFilled />),
+        getItem('BookMark', PathName.BOOK_MARK, PathName.BOOK_MARK, <BookFilled />),
+        getItem('Add post', PathName.ADD_POST, PathName.ADD_POST, <EditFilled />),
+        getItem('Admin', PathName.ADMIN, PathName.ADMIN, <TrashFilled />),
+    ].filter(Boolean);
+
     return (
         <>
             <div className="h-full min-w-[5rem]"></div>
@@ -43,6 +67,9 @@ function SideBar() {
                     >
                         <div className="w-full mb-4 mt-4">
                             <Image
+                                onClick={() => {
+                                    router.push('/');
+                                }}
                                 alt="logo"
                                 className="m-auto"
                                 height={30}
@@ -52,9 +79,28 @@ function SideBar() {
                                 }
                             />
                         </div>
-                        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-                        <div className="center-item w-full h-[5rem]">
-                            <UserButton />
+                        <Menu
+                            theme="dark"
+                            defaultSelectedKeys={[props.activeSidebar]}
+                            key={props.activeSidebar}
+                            mode="inline"
+                            items={isAdmin ? itemsHasAdmin : items}
+                        />
+                        <div className="center-item w-full h-[5rem] text-white">
+                            {user ? (
+                                <UserButton afterSignOutUrl="/sign-in" />
+                            ) : (
+                                <Button
+                                    style={{
+                                        color: 'white',
+                                    }}
+                                    onClick={() => {
+                                        router.replace(PathName.SIGN_IN);
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                            )}
                         </div>
                     </Flex>
                 </Sider>

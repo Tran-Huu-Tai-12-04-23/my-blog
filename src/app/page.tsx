@@ -1,12 +1,15 @@
 'use client';
-import { Flex, Tabs, TabsProps } from 'antd';
+import { Flex, Input, Tabs, TabsProps, Tag } from 'antd';
 import BlogItem from './component/ui/BlogItem';
 import { Suspense } from 'react';
+import { useHorizontalScroll } from '../hook/useHorizontalScroll';
 
+const { Search } = Input;
 export default function Home() {
     const onChange = (key: string) => {
         console.log(key);
     };
+    const topics = ['Tech', 'Course', 'Source', 'New Framework', 'NodeJS', 'Java'];
 
     const items: TabsProps['items'] = [
         {
@@ -39,8 +42,23 @@ export default function Home() {
             ),
         },
     ];
+
+    const scrollContainerRef = useHorizontalScroll<HTMLDivElement>();
+
     return (
         <div className="w-full">
+            <div className="max-w-[30rem]">
+                <Search placeholder="Search by title, topic..." />
+            </div>
+            <div ref={scrollContainerRef} className="flex gap-2 mt-4 w-full items-center">
+                {topics.map((tp, index) => {
+                    return (
+                        <Tag className="cursor-pointer hover:brightness-110" key={index} color="processing">
+                            {tp}
+                        </Tag>
+                    );
+                })}
+            </div>
             <Tabs defaultActiveKey="1" items={items} onChange={onChange} />;
         </div>
     );

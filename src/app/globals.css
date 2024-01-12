@@ -6,13 +6,13 @@
 }
 /* config theme antd */
 /* custom class tailwind csss */
-.dark {
+/* .dark {
     @apply bg-gradient-to-b from-[#374151] to-[#111827] text-white;
 }
 
 .light {
     @apply bg-white text-black;
-}
+} */
 
 .center-item {
     @apply flex justify-center items-center;
